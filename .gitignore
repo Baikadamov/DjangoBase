@@ -1,0 +1,10 @@
+/media/
+
+venv/
+.env
+*.env
+*.venv
+
+/staticfiles/
+
+db.sqlite3

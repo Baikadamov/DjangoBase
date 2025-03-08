@@ -1,0 +1,39 @@
+services:
+  web:
+    build: .
+    container_name: django_app
+    command: gunicorn --bind 0.0.0.0:8000 --workers 3 DjangoBaseApp.wsgi:application
+    volumes:
+      - .:/app
+      - ./media:/media
+    expose:
+      - "8000"  # Теперь не публикуем, а только открываем для Nginx
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    networks:
+      - dev
+
+  nginx:
+    image: nginx:stable-alpine
+    container_name: nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./staticfiles:/static
+      - ./media:/media
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - web
+    networks:
+      - dev
+
+volumes:
+  sqlite_data:
+
+networks:
+  dev:
